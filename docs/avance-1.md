@@ -81,7 +81,7 @@ classDiagram
         -Longstring justificacion
     }
  
-    Reportante "1" --> "0..*" Aviso : registra
+    Reportante "1" <-- "0..*" Aviso : registra
     Operador "1" --> "0..*" Aviso : evalua
     Aviso "1" *-- "0..*" Nota
     Aviso "1" *-- "1" Estado
@@ -115,6 +115,9 @@ stateDiagram-v2
 |   **Aviso**    | Conservar información de un aviso, cambiar de estado                      | Nota, Estado, Reportante, Operador |
 |    **Nota**    | Conservar información de una nota                                         |                   Aviso |
 |   **Estado**   | Permitir/bloquear agregación de notas, devolver resultado de transiciones |                   Aviso |
+| **Pendiente**  | Permitir agregar notas, transicionar a aceptado o descartado              |                   Aviso |
+|  **Aceptado**  | Bloquear agregar notas y transiciones, enlazar un aviso a una emergencia  |       Aviso, Emergencia |
+| **Descartado** | Bloquear agregar notas y transiciones, conservar la fecha y justificación del descarte |      Aviso |
 | **Reportante** | Generar avisos, agregar notas a avisos                                    |                   Aviso |
 |  **Operador**  | Aceptar avisos, descartar avisos                                          |                   Aviso |
 
@@ -125,6 +128,6 @@ La consigna dice que puede agregar notas su reportante
 ¿Quién verifica eso, el aviso o la capa que recibe al usuario autenticado?
 
 La verificación debería realizarla la capa que recibe al usuario autenticado, no el aviso.
-De otra forma el aviso debería operar con datos de sesión que le son externos, se mezclarian reglas 
+De otra forma el aviso debería operar con datos de sesión que le son externos y se mezclarian reglas.
 
 ----------

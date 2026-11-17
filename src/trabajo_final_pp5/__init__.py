@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from trabajo-final-pp5!")
+from .avisos import *
