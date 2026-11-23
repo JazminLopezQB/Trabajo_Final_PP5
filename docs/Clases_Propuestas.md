@@ -927,7 +927,6 @@ classDiagram
     }
     class Operacion {
         <<enumeration>>
-        (ver sección de Enumeraciones)
     }
 
     Registro "0..*" --> "1" Operacion : operacion
@@ -951,19 +950,28 @@ classDiagram
 ---
 # Convenciones Empleadas
 
-- **Tipos**: `Int`, `String`, `Longstring`, `Bool` y `Datetime` son los tipos básicos. `Arreglo de X` es una colección ordenada y `Conjunto de X` una colección sin repetidos.
-- **Referencias**: un contenedor conoce a sus partes por objeto (`Aviso` a sus `Nota`, `Emergencia` a sus `Mision`, `Unidad` a su `Dotacion`, `Vehiculo` y `Equipamiento`) y las partes conocen a su contenedor solo por identificador. Entre entidades independientes tampoco se guardan objetos, solo identificadores. Un atributo `(Int → Clase) xId` guarda el identificador de otra entidad, y así no hay referencias circulares.
-- **Dependencias por parámetro**: cuando una operación necesita datos de otra entidad la recibe como parámetro o la crea, sin guardarla.
-- **Identificadores**: los asigna la persistencia al guardar. Un objeto nuevo tiene `id` nulo hasta entonces, y los identificadores que se usan como referencia corresponden siempre a objetos ya guardados. `Nota`, `Novedad` y `Dotacion` no tienen `id` porque solo existen dentro de su entidad contenedora.
+- **Tipos**:
+	- `Int`, `String`, `Longstring`, `Bool` y `Datetime` son los tipos básicos.
+ 	- `Arreglo de X` es una colección ordenada y `Conjunto de X` una colección sin repetidos.
+- **Referencias**:
+	- Un contenedor conoce a sus partes por objeto (`Aviso` a sus `Nota`, `Emergencia` a sus `Mision`, `Unidad` a su `Dotacion`, `Vehiculo` y `Equipamiento`) y las partes conocen a su contenedor solo por identificador.
+	- Entre entidades independientes tampoco se guardan objetos, solo identificadores.
+ 	- Un atributo `(Int → Clase) xId` guarda el identificador de otra entidad, y así no hay referencias circulares.
+- **Dependencias por parámetro**: Cuando una operación necesita datos de otra entidad la recibe como parámetro o la crea, sin guardarla.
+- **Identificadores**:
+	- Los asigna la persistencia al guardar.
+	 - Un objeto nuevo tiene `id` nulo hasta entonces, y los identificadores que se usan como referencia corresponden siempre a objetos ya guardados.
+	- `Nota`, `Novedad` y `Dotacion` no tienen `id` porque solo existen dentro de su entidad contenedora.
 - **Valores inmutables**: `Nota`, `Novedad` y `Requisitos` no ofrecen operaciones que los modifiquen y exigen todos sus datos al construirse, por lo que no pueden existir incompletos.
 - **Colecciones**: `notas`, `novedades`, `misiones` y `personas` son privadas y se exponen de solo lectura, de modo que no se pueda saltear la regla de la entidad.
-- **Fechas**: las fechas de creación se llaman `fechaCreacion`, las de hechos puntuales conservan su nombre, como `fechaDescarte` o `fechaFinalizacion`. El dominio nunca toma la hora actual: la capa de aplicación la entrega como parámetro.
-- **Propiedades**: los atributos descritos como "Propiedad de solo lectura" se derivan de otros datos, se consultan con `getters` y no tienen método propio.
-- **Clases y enumeraciones**: cuando los estados o características de un recurso presentaban lógica propia se diseñaron clases dedicadas, caso contrario se usó una enumeración descriptiva. Por eso los tipos de misión se distinguen por sus `Requisitos` y no por subclases, y el perfil de un usuario es su clase concreta y no una enumeración.
-- **Altas de recursos**: el personal, los vehículos, el equipamiento, las unidades y las bases se crean invocando sus constructores cuando es necesario, por lo que no hay métodos dedicados de alta. Quién puede hacerlo lo controla la capa de aplicación según el perfil del usuario.
-- **Máquinas de estado**: `EstadoAviso` y `EstadoMision` siguen el mismo mecanismo: sus métodos rechazan toda transición por defecto, cada subclase sobreescribe solo las que permite y las transiciones válidas devuelven el estado siguiente, que la entidad asigna una vez verificado todo. Los estados solo deciden: no modifican a la entidad, ni a otras, ni crean objetos. Los efectos sobre otras entidades los hace la entidad que recibe la operación, `Aviso` al crear la emergencia y `Mision` al reservar y liberar la unidad.
-- **Reasignación**: asignar una unidad a una misión que ya tenía una es una reasignación y se resuelve con el mismo método `asignar()`. La capa de aplicación captura la unidad actual de la misión antes de ejecutarla y registra `AsignarMision` o `ReasignarMision` según la misión tuviera o no unidad.
-- **Usuarios**: los usuarios son identidad. Lo que cada perfil puede hacer lo resuelve la capa de aplicación y las reglas de cada operación viven en la entidad afectada (ver *Capa de Aplicación: Casos de Uso y Autorización*).
-- **Diagramas de clases**: toda asociación, agregación y composición se rotula con el nombre del atributo que la implementa, y todo atributo cuyo tipo es otra clase o una enumeración tiene su flecha. Las referencias por identificador se dibujan con flecha punteada rotulada con el atributo, y las dependencias por parámetro o creación con flecha punteada rotulada `usa` o `crea`. Las clases de otras secciones se muestran solo con los atributos que las relacionan.
-- **Tarjetas CRC**: las subclases listan los colaboradores de su superclase además de los propios.
-- **Errores**: toda operación inválida lanza una excepción de dominio con el motivo y no deja modificaciones parciales, porque las verificaciones se ejecutan completas antes del primer cambio.
+- **Fechas**: Las fechas de creación se llaman `fechaCreacion`, las de hechos puntuales conservan su nombre, como `fechaDescarte` o `fechaFinalizacion`.
+- **Clases y enumeraciones**:
+	- Cuando los estados o características de un recurso presentaban lógica propia se diseñaron clases dedicadas, caso contrario se usó una enumeración descriptiva.
+	- Por eso los tipos de misión se distinguen por sus `Requisitos` y no por subclases, y el perfil de un usuario es su clase concreta y no una enumeración.
+- **Altas de recursos**:
+	- El personal, los vehículos, el equipamiento, las unidades y las bases se crean invocando sus constructores cuando es necesario, por lo que no hay métodos dedicados de alta.
+	- Quién puede hacerlo lo controla la capa de aplicación según el perfil del usuario.
+- **Usuarios**:
+	- Los usuarios son identidades.
+	- Lo que cada perfil puede hacer lo resuelve la capa de aplicación y las reglas de cada operación viven en la entidad afectada.
+- **Errores**: Toda operación inválida lanza una excepción de dominio con el motivo y no deja modificaciones parciales, porque las verificaciones se ejecutan completas antes del primer cambio.
