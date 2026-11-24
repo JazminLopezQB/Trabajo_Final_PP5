@@ -863,23 +863,25 @@ stateDiagram-v2
 
 ### Historial de Operaciones
 
+- [ ] Clase `Afectado` (valor inmutable)
+    - **Atributos**:
+        - **`(TipoRecurso) tipo`**: Clase de recurso al que se refiere, su enlace a la enumeración `TipoRecurso`.
+        - **`(Int) recursoId`**: Identificador del recurso, que corresponde siempre a un objeto ya guardado.
+
 - [ ] Clase `Registro` (inmutable)
-	- **Atributos**:
-		- **`(Int) id`**: Identificador único del registro.
-		- **`(Int → Usuario) actorId`**: Actor que realizó la operación.
-		- **`(Datetime) fechaCreacion`**: Fecha y hora en que se realizó la operación.
-		- **`(Operacion) operacion`**: Operación realizada, su enlace a la enumeración `Operacion`.
-		- **`(Int → Aviso) avisoId`**: Aviso afectado o nulo si la operación no lo afecta.
-		- **`(Int → Emergencia) emergenciaId`**: Emergencia afectada o nulo si la operación no la afecta.
-		- **`(Int → Mision) misionId`**: Misión afectada o nulo si la operación no la afecta.
-		- **`(Int → Unidad) unidadId`**: Unidad afectada o nulo si la operación no la afecta. En una reasignación es la unidad nueva.
-		- **`(Int → Unidad) unidadAnteriorId`**: Unidad que se reemplaza en una reasignación, o nulo en cualquier otra operación.
-		- **`(Int → Personal) personaId`**: Persona afectada o nulo si la operación no la afecta.
-		- **`(Int → Vehiculo) vehiculoId`**: Vehículo afectado o nulo si la operación no lo afecta.
-		- **`(Int → Equipamiento) equipoId`**: Equipamiento afectado o nulo si la operación no lo afecta.
-		- **`(Longstring) detalle`**: Cambios, motivos y resultados propios de la operación.
+    - **Atributos**:
+        - **`(Int) id`**: Identificador único del registro.
+        - **`(Int → Usuario) actorId`**: Actor que realizó la operación.
+        - **`(Datetime) fechaCreacion`**: Fecha y hora en que se realizó la operación.
+        - **`(Operacion) operacion`**: Operación realizada, su enlace a la enumeración `Operacion`.
+        - **`(Arreglo de Afectado) afectados`**: Recursos que intervinieron en la operación, con al menos uno. Es privado y se expone de solo lectura.
+        - **`(Longstring) detalle`**: Cambios, motivos y resultados propios de la operación.
+    - **Métodos**:
+        - **`afectadosDe(self, tipo)`**: Devuelve los afectados del tipo de recurso indicado.
+        - **`afecta(self, tipo, recursoId)`**: Devuelve verdadero si el registro involucra al recurso indicado, con cualquier rol.
 
 ##### Diagrama de Clases
+
 ```mermaid
 classDiagram
     direction LR
@@ -890,37 +892,37 @@ classDiagram
         -Int actorId
         -Datetime fechaCreacion
         -Operacion operacion
-        -Int avisoId
-        -Int emergenciaId
-        -Int misionId
-        -Int unidadId
-        -Int unidadAnteriorId
-        -Int personaId
-        -Int vehiculoId
-        -Int equipoId
+        -Afectado[] afectados
         -Longstring detalle
+        +afectadosDe(tipo) Afectado[]
+        +afecta(tipo, recursoId) Bool
+    }
+    class Afectado {
+        <<valor>>
+        -TipoRecurso tipo
+        -Int recursoId
     }
     class Operacion {
         <<enumeration>>
+    } 
+    class TipoRecurso {
+        <<enumeration>>
     }
+    class Usuario
 
     Registro "0..*" --> "1" Operacion : operacion
     Registro "0..*" ..> "1" Usuario : actorId
-    Registro "0..*" ..> "0..1" Aviso : avisoId
-    Registro "0..*" ..> "0..1" Emergencia : emergenciaId
-    Registro "0..*" ..> "0..1" Mision : misionId
-    Registro "0..*" ..> "0..1" Unidad : unidadId
-    Registro "0..*" ..> "0..1" Unidad : unidadAnteriorId
-    Registro "0..*" ..> "0..1" Personal : personaId
-    Registro "0..*" ..> "0..1" Vehiculo : vehiculoId
-    Registro "0..*" ..> "0..1" Equipamiento : equipoId
+    Registro "1" *-- "1..*" Afectado : afectados
+    Afectado "0..*" --> "1" TipoRecurso : tipo
 ```
 
 ##### Tarjetas CRC
 
-| Clase      | Responsabilidades                                                                                                                      | Colaboradores |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `Registro` | Conservar de forma inmutable quién hizo qué, cuándo, sobre qué recursos (por identificador) y con qué cambios, motivos y resultados.   | `Operacion`   |
+| Clase      | Responsabilidades                                                                                                                                        | Colaboradores           |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `Registro` | Conservar de forma inmutable quién hizo qué, cuándo, sobre qué recursos y con qué cambios, motivos y resultados, y decir si involucra a un recurso dado. | `Operacion`, `Afectado` |
+| `Afectado` | Identificar un recurso intervenido en una operación por su tipo y su identificador.                                                                      | `TipoRecurso`           |
+
 
 ---
 # Convenciones Empleadas
