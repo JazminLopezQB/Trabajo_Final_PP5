@@ -634,9 +634,6 @@ stateDiagram-v2
 		- **`(CategoriaEquipo) categoriaEquipo`**: Categoría de equipamiento operativo requerida o nulo si no requiere ninguna.
 		- **`(Int) evacuados`**: Cantidad de personas a trasladar, positiva en una evacuación y cero en los demás tipos.
 	- **Métodos**:
-		- **`evacuacion(evacuados)`**: Crea los requisitos de una evacuación (transporte, conductor y evacuador, para inundación e incendio) o genera una excepción si `evacuados` no es positivo.
-		- **`rescate()`**: Crea los requisitos de un rescate (vehículo de rescate, conductor, dos rescatistas y equipo de rescate, para cualquier situación).
-		- **`asistenciaSanitaria()`**: Crea los requisitos de una asistencia sanitaria (ambulancia, conductor, primeros auxilios y equipo sanitario, para cualquier situación).
 		- **`compatibleCon(self, situacion)`**: Devuelve verdadero si el tipo de misión está contemplado para la situación indicada.
 
 - [ ] Clase `Mision`
@@ -734,9 +731,6 @@ classDiagram
         -CategoriaVehiculo categoriaVehiculo
         -CategoriaEquipo categoriaEquipo
         -Int evacuados
-        +evacuacion(evacuados)$ Requisitos
-        +rescate()$ Requisitos
-        +asistenciaSanitaria()$ Requisitos
         +compatibleCon(situacion) Bool
     }
     class Mision {
