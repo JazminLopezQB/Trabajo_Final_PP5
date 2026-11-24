@@ -200,6 +200,8 @@ classDiagram
 		- **`(Int) id`**: Identificador único del usuario.
 		- **`(String) nombreUsuario`**: Nombre que identifica al usuario y que utiliza para ingresar al sistema.
 		- **`(Credencial) credencial`**: Credencial del usuario para autenticarse, su enlace a la clase `Credencial`.
+  		- **`(Perfil) perfil`**: Perfil que identifica al usuario, conexión a la enumeración `Perfil`
+        - **`(Int -> Personal) personaId`**: ID de la persona parte del `Personal` asociada, nulo a menos que se trate del jefe de una unidad.
 	- **Métodos**:
 		- **`autenticar(self, clave)`**: Devuelve verdadero si la clave ingresada coincide con la credencial del usuario, delegando la comprobación en `Credencial.verificar()`.
 
@@ -209,23 +211,6 @@ classDiagram
 	- **Métodos**:
 		- **`crear(clave)`**: Genera el hash de la contraseña recibida.
 		- **`verificar(self, clave)`**: Devuelve verdadero si el hash de la contraseña ingresada coincide con el almacenado, o falso en caso contrario.
-
-- [ ] Clase `Reportante(Usuario)`
-	- **Atributos**:
-		- **`(String) institucion`**: Organismo o institución a la que pertenece el reportante.
-
-- [ ] Clase `Operador(Usuario)`
-	- Sin atributos ni métodos propios, su clase identifica el perfil.
-
-- [ ] Clase `Jefe(Usuario)`
-	- **Atributos**:
-		- **`(Int → Personal) personaId`**: Persona que cumple las funciones de jefe. La unidad que dirige no se guarda, se determina consultando a qué unidad pertenece y si `Unidad.dirigidaPor(personaId)` es verdadero.
-
-- [ ] Clase `Responsable(Usuario)`
-	- Sin atributos ni métodos propios, su clase identifica el perfil.
-
-- [ ] Clase `Supervisor(Usuario)`
-	- Sin atributos ni métodos propios, su clase identifica el perfil.
 
 - [ ] Clase `Personal`
 	- **Atributos**:
@@ -260,6 +245,8 @@ classDiagram
         -Int id
         -String nombreUsuario
         -Credencial credencial
+		-Perfil perfil
+		-Int personaId
         +autenticar(clave) Bool
     }
     class Credencial {
@@ -267,15 +254,7 @@ classDiagram
         +crear(clave)
         +verificar(clave) Bool
     }
-    class Reportante {
-        -String institucion
-    }
-    class Operador
-    class Jefe {
-        -Int personaId
-    }
-    class Responsable
-    class Supervisor
+   
     class Personal {
         -Int id
         -String nombre
@@ -306,13 +285,9 @@ classDiagram
         -Dotacion dotacion
     }
 
-    Usuario <|-- Reportante
-    Usuario <|-- Operador
-    Usuario <|-- Jefe
-    Usuario <|-- Responsable
-    Usuario <|-- Supervisor
+    Usuario "0..1" ..> "1" Personal : personaId
     Usuario "1" *-- "1" Credencial : credencial
-    Jefe "0..1" ..> "1" Personal : personaId
+    Usuario "1" --> "1" Perfil: perfil
     Personal "0..*" --> "1..*" Competencia : competencias
     Personal "1..*" ..> "0..1" Unidad : unidadId
     Unidad "1" *-- "1" Dotacion : dotacion
